@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SkillSync – Smart Resume Matcher</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#5e60ce',
+            secondary: '#f72585',
+          },
+        },
+      }
+    }
+  </script>
+  <style>
+    body {
+      background-image: url('https://res.cloudinary.com/dx9m0jvtj/image/upload/v1753173876/feminine_1_tka6pr.jpg');
+      background-size: cover;
+      background-position: center;
+    }
+    .glass {
+      backdrop-filter: blur(20px);
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 1rem;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between px-4 py-10 text-gray-800">
+
+  <div class="glass w-full max-w-5xl mx-auto p-8">
+    <h1 class="text-4xl font-bold text-center text-primary mb-8">💼 SkillSync – Smart Resume Matcher</h1>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div>
+        <label class="block font-semibold mb-1">Paste Resume</label>
+        <textarea id="resumeText" class="w-full h-48 p-3 rounded border border-gray-300 focus:ring-2 focus:ring-primary" placeholder="Paste your resume text here..."></textarea>
+      </div>
+      <div>
+        <label class="block font-semibold mb-1">Paste Job Description</label>
+        <textarea id="jobText" class="w-full h-48 p-3 rounded border border-gray-300 focus:ring-2 focus:ring-secondary" placeholder="Paste job description here..."></textarea>
+      </div>
+    </div>
+    <div class="flex justify-center mt-6">
+      <button onclick="matchResume()" class="bg-primary text-white px-6 py-3 rounded shadow hover:bg-indigo-700 transition duration-300">
+        🔍 Match Now
+      </button>
+    </div>
+    <div id="result" class="mt-6 text-center text-lg font-semibold"></div>
+  </div>
+
+  <footer class="text-center mt-10 text-white font-medium">
+    Made with ❤️ by <span class="text-pink-200 font-bold">Nitya Choudhary</span> • © 2025 SkillSync
+  </footer>
+
+  <script>
+    async function matchResume() {
+      const resume = document.getElementById('resumeText').value;
+      const jobDesc = document.getElementById('jobText').value;
+
+      const response = await fetch('http://127.0.0.1:8000/api/match', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ resume, jobDesc })
+      });
+
+      const data = await response.json();
+      const score = (data.matches[0].skillMatchScore * 100).toFixed(2);
+      const remarks = data.matches[0].remarks;
+
+      document.getElementById('result').innerHTML = `
+        <p class="text-2xl text-primary">✅ Match Score: <span class="font-bold">${score}%</span></p>
+        <p class="text-secondary mt-2">💡 ${remarks}</p>
+      `;
+    }
+  </script>
+</body>
+</html>
